@@ -4,6 +4,11 @@ import TurboButton from "../components/TurboButton";
 import ProgressBar from "../components/ProgressBar";
 import WindowComponent from "../components/WindowComponent";
 import DisplayFFT from "../components/DisplayFFT";
+import VisualItemDisplay from "../components/VisualItemDisplay";
+import {DndContext} from '@dnd-kit/core';
+import {Draggable} from './Draggable';
+import {Droppable} from './Droppable';
+
 export interface HardwareStats {
     GPUUsage: number;
     GPUTemperature: number;
@@ -122,17 +127,29 @@ export default function ControlPage() {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-row gap-10 h-[600px]">
+                <div className="flex flex-row gap-10 h-[650px]">
                     <WindowComponent title={"Live samples"}>
-                        <div className="">
-                        zefzfe
-                        zefzfe
-                        zefzfe
+                        <div className="flex flex-col gap-2">
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
                         </div>
                     </WindowComponent>
                     <WindowComponent title={"collection"}>
-                        <div>
-                            zefzfe
+                    <div className="flex flex-col gap-2">
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
+                            <VisualItemDisplay image={""} title={"Hello"} comment={"I'm a comment"} />
                         </div>
                     </WindowComponent>
                 </div>
