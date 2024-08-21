@@ -14,7 +14,7 @@ export default function WindowComponent(props: WindowComponentProps) {
                 <div className="w-[300px] flex items-center justify-center pt-4" style={{
                     backgroundImage: 'url(./UI/TitleBar.png)',
                     aspectRatio: '600/100',
-                    backgroundSize: 'contain'
+                    backgroundSize: 'cover'
                 }}>
                     <div className="font-black uppercase text-gray-600 drop-shadow-2xl">
                         {props.title}
@@ -24,7 +24,7 @@ export default function WindowComponent(props: WindowComponentProps) {
                 <div className=" w-full" style={{
                     aspectRatio: '820/126',
                     backgroundImage: 'url(./UI/WindowTop.png)',
-                    backgroundSize: 'contain'
+                    backgroundSize: 'cover'
                 }} />
                 <div className="w-full px-8 h-full" style={{
                     backgroundImage: 'url(./UI/WindowMiddle.png)',
@@ -38,7 +38,7 @@ export default function WindowComponent(props: WindowComponentProps) {
                     backgroundImage: 'url(./UI/WindowTop.png)',
                     aspectRatio: '820/126',
                     transform: 'rotate(180deg)',
-                    backgroundSize: 'contain'
+                    backgroundSize: 'cover'
                 }} />
             </div>
         </div>

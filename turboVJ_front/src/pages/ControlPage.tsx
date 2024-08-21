@@ -6,8 +6,6 @@ import WindowComponent from "../components/WindowComponent";
 import DisplayFFT from "../components/DisplayFFT";
 import VisualItemDisplay from "../components/VisualItemDisplay";
 import {DndContext} from '@dnd-kit/core';
-import {Draggable} from './Draggable';
-import {Droppable} from './Droppable';
 
 export interface HardwareStats {
     GPUUsage: number;

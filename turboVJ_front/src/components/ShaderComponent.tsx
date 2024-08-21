@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Shaders, Node, GLSL, Uniform } from "gl-react";
 import { Surface } from "gl-react-dom";
+import { useSocket } from "../contexts/SocketContext";
 
 const shaderTemplate = GLSL`#version 300 es
 
@@ -90,6 +91,7 @@ interface VisualsDTO {
     visuals: VisualDTO[];
 }
 export const ShaderSurface = (props: ShaderProps) => {
+    const { socket } = useSocket();
     const [ visuals, setVisuals ] = useState<VisualDTO[]>([]);
     const [code, setCode] = useState("");
     const [ uniforms, setUniforms ] = useState<UniformDTO[]>([]);
