@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Shaders, Node, GLSL, Uniform } from "gl-react";
 import { Surface } from "gl-react-dom";
 import { useSocket } from "../contexts/SocketContext";
+import ComposerShader from "./ComposerShader";
 
 const shaderTemplate = GLSL`#version 300 es
 
@@ -26,7 +27,6 @@ interface IShaderProps {
     uniforms: UniformDTO[];
 }
 export const MainShader = (props: IShaderProps) => {
-     
     const refNode = useRef<any>();
     const [width, setWidth] = useState<number>(0);
     const [height, setHeight] = useState<number>(0);
@@ -59,15 +59,15 @@ export const MainShader = (props: IShaderProps) => {
     const newCode = code.replace("___REPLACE___ME___", props.code);
     // {frag: shaders.code}
     const uniforms = { iResolution: [width, height], iTime: time };
-    const uniformsOptions = {}; 
-    props.uniforms.forEach(el=>{
+    const uniformsOptions = {};
+    props.uniforms.forEach(el => {
         (uniforms as any)[el.name] = el.source;
-        (uniformsOptions as any)[el.name]= {
+        (uniformsOptions as any)[el.name] = {
             wrap: "repeat"
         };
     })
     // console.log("UNIFORMS ", uniforms)
-    return <Node ref={refNode} shader={{frag: newCode}} uniforms={uniforms} uniformsOptions={uniformsOptions} />;
+    return <Node ref={refNode} shader={{ frag: newCode }} uniforms={uniforms} uniformsOptions={uniformsOptions} />;
 };
 
 interface ShaderProps {
@@ -90,18 +90,27 @@ interface VisualDTO {
 interface VisualsDTO {
     visuals: VisualDTO[];
 }
+
+interface ReadyVisualDTO {
+    code: string;
+    uniforms: UniformDTO[];
+}
+
 export const ShaderSurface = (props: ShaderProps) => {
     const { socket } = useSocket();
-    const [ visuals, setVisuals ] = useState<VisualDTO[]>([]);
-    const [code, setCode] = useState("");
-    const [ uniforms, setUniforms ] = useState<UniformDTO[]>([]);
+
+    const [visuals, setVisuals] = useState<ReadyVisualDTO[]>([]);
+
     const [width, setWidth] = useState<number>(0);
     const [height, setHeight] = useState<number>(0);
 
-    useEffect(()=>{
-        fetch(`${API_ROOT}/visuals`).then(b=>b.text()).then(text=>{
+    useEffect(() => {
+        fetch(`${API_ROOT}/visuals`).then(b => b.text()).then(text => {
             const visualsJsonObj = JSON.parse(text) as VisualsDTO;
-            setVisuals(visualsJsonObj.visuals);
+            const visualsDTO = visualsJsonObj.visuals;
+            Promise.all(visualsDTO.map(el => handleClick(el))).then((visuals) => {
+                setVisuals(visuals);
+            })
         })
     }, []);
 
@@ -119,32 +128,37 @@ export const ShaderSurface = (props: ShaderProps) => {
         }
     }, []);
 
-    function handleClick(visual: VisualDTO) {
-        fetch(`${API_ROOT}/resource/${btoa(visual.source)}`).then(b=>b.text()).then(text=>{
-            let codeUniforms = "";
+    function handleClick(visual: VisualDTO): Promise<ReadyVisualDTO> {
+        return new Promise((resolve, reject) => {
 
-            const transformedUniforms : UniformDTO[] = [];
+            fetch(`${API_ROOT}/resource/${btoa(visual.source)}`).then(b => b.text()).then(text => {
+                let codeUniforms = "";
 
-            visual.uniforms.forEach(el=>{
-                codeUniforms += `uniform sampler2D ${el.name};\n`;
-                transformedUniforms.push({
-                    name: el.name,
-                    source: `${API_ROOT}/resource/${btoa(el.source)}`
+                const transformedUniforms: UniformDTO[] = [];
+
+                visual.uniforms.forEach(el => {
+                    codeUniforms += `uniform sampler2D ${el.name};\n`;
+                    transformedUniforms.push({
+                        name: el.name,
+                        source: `${API_ROOT}/resource/${btoa(el.source)}`
+                    })
                 })
-            })
-            
-            setCode(codeUniforms + "\n\n" + text);
-            setUniforms(transformedUniforms);
 
-        })
+                resolve({ code: codeUniforms + "\n\n" + text, uniforms: transformedUniforms })
+            })
+        });
+
     }
 
     return (<div className=" w-full h-full">
-        <div className=" flex flex-row gap-2 z-50 p-5">
+        {/* <div className=" flex flex-row gap-2 z-50 p-5">
             {visuals.map(el=><button onClick={()=>{handleClick(el)}} className="bg-blue-400">{el.source}</button>)}
-        </div>
+        </div> */}
         <Surface pixelRatio={1.0} width={width} height={height} style={{ width: '100vw', height: '100vh', justifyContent: 'center' }}>
-            <MainShader code={code} uniforms={uniforms}/>
+            <ComposerShader visuals={
+                visuals.map(el => <MainShader code={el.code} uniforms={el.uniforms} />)
+            } />
+
         </Surface>
     </div>);
 }
