@@ -7,6 +7,7 @@ import websocket from '@fastify/websocket'
 import * as WebSocket from 'ws';
 import midi from 'midi'
 import { KorgNanoKontrol2_State, ResetMidi } from './SetupMidi'
+import { SocketPayload } from './SocketTypes'
 
 
 const midiState: KorgNanoKontrol2_State = {
@@ -23,16 +24,32 @@ for (let i = 0 ; i < 8; ++i) {
     })
 }
 
-setInterval(()=>{
-    ResetMidi(midiState);
-}, 1000)
 
 const connectedSockets: WebSocket.WebSocket[] = [];
+
+setInterval(()=>{
+    ResetMidi(midiState, (state: KorgNanoKontrol2_State) => {
+        // console.log("MIDI STATE " + JSON.stringify(state));
+        connectedSockets.forEach(sock=>{
+            if (sock) {
+                const socketPayload : SocketPayload = {
+                    method: 'korg_nanokontrol2',
+                    data: state
+                };
+                sock.send(JSON.stringify(socketPayload));
+            }
+        })
+    });
+}, 1000)
 
 SetupHardwareMonitoring((stats: HardwareStats) =>{
     connectedSockets.forEach(sock=>{
         if (sock) {
-            sock.send(JSON.stringify(stats));
+            const socketPayload : SocketPayload = {
+                method: 'hardware_stats',
+                data: stats
+            };
+            sock.send(JSON.stringify(socketPayload));
         }
     })
     // console.log("SENDING " + connectedSockets.length + JSON.stringify(stats) )

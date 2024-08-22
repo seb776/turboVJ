@@ -6,6 +6,7 @@ import WindowComponent from "../components/WindowComponent";
 import DisplayFFT from "../components/DisplayFFT";
 import VisualItemDisplay from "../components/VisualItemDisplay";
 import {DndContext} from '@dnd-kit/core';
+import { SocketPayload } from "../SocketTypes";
 
 export interface HardwareStats {
     GPUUsage: number;
@@ -36,9 +37,11 @@ export default function ControlPage() {
 
     useEffect(() => {
         if (socket) {
-            socket.addEventListener("message", (data) => {
-                console.log('received message', data)
-                setStats(JSON.parse(data.data));
+            socket.onMessage((data) => {
+                console.log("Received message control page", data);
+                if (data.method === 'hardware_stats') {
+                    setStats(data.data);
+                }
             });
         }
         // TODO clear callback ?

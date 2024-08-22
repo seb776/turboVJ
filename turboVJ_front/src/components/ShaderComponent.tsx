@@ -67,7 +67,7 @@ export const MainShader = (props: IShaderProps) => {
         };
     })
     // console.log("UNIFORMS ", uniforms)
-    return <Node ref={refNode} shader={{ frag: newCode }} uniforms={uniforms} uniformsOptions={uniformsOptions} />;
+    return <Node ignoreUnusedUniforms ref={refNode} shader={{ frag: newCode }} uniforms={uniforms} uniformsOptions={uniformsOptions} />;
 };
 
 interface ShaderProps {
@@ -151,14 +151,10 @@ export const ShaderSurface = (props: ShaderProps) => {
     }
 
     return (<div className=" w-full h-full">
-        {/* <div className=" flex flex-row gap-2 z-50 p-5">
-            {visuals.map(el=><button onClick={()=>{handleClick(el)}} className="bg-blue-400">{el.source}</button>)}
-        </div> */}
-        <Surface pixelRatio={1.0} width={width} height={height} style={{ width: '100vw', height: '100vh', justifyContent: 'center' }}>
+        <Surface pixelRatio={0.5} width={width} height={height} style={{ width: '100vw', height: '100vh', justifyContent: 'center' }}>
             <ComposerShader visuals={
                 visuals.map(el => <MainShader code={el.code} uniforms={el.uniforms} />)
             } />
-
         </Surface>
     </div>);
 }

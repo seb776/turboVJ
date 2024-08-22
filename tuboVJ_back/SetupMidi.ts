@@ -7,13 +7,13 @@ export interface KorgNanoKontrol2_VerticalAreaState {
     mButton: number;
     rButton: number;
 }
-export interface KorgNanoKontrol2_State {
+export interface KorgNanoKontrol2_State { // TODO common sources
     rightSide: KorgNanoKontrol2_VerticalAreaState[];
 }
 
 let midiInput: midi.Input | undefined = undefined;
 
-export function ResetMidi(midiState: KorgNanoKontrol2_State) {
+export function ResetMidi(midiState: KorgNanoKontrol2_State, onMidiMessage: (state: KorgNanoKontrol2_State) => void) {
     if (midiInput) {
         midiInput.closePort();
     }
@@ -48,7 +48,8 @@ export function ResetMidi(midiState: KorgNanoKontrol2_State) {
             const targetIndex = message[1] - 64;
             midiState.rightSide[targetIndex].rButton = message[2] / 127.0;
         }
-        console.log(midiState);
+        // console.log(midiState);
+        onMidiMessage(midiState);
         // console.log(`m: ${message} d: ${deltaTime}`);
     });
     midiInput.openPort(0);
