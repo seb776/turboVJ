@@ -44,9 +44,10 @@ export const MainShader = (props: IShaderProps) => {
 
     function handleLoop(curTime: DOMHighResTimeStamp) {
         let offsetTime = refMidi ? refMidi.current?.rightSide[2].knob : 0;
+        let timeSpeed = refMidi && refMidi.current ? (refMidi.current.rightSide[3].knob - 0.5)*2 : 1;
         if (refMidi)
         console.log("OFFSET", refMidi.current?.rightSide[2].knob)
-        setTime(curTime / 1000.0 + (offsetTime-0.5)*10.);
+        setTime(timeSpeed*curTime / 1000.0 + (offsetTime-0.5)*10.);
         refLoop.current = requestAnimationFrame(handleLoop);
     };
     useEffect(() => {
@@ -163,7 +164,7 @@ export const ShaderSurface = (props: ShaderProps) => {
 
     }
 
-    return (<div className=" w-full h-full">
+    return (<div className=" w-full h-full overflow-hidden">
         <Surface pixelRatio={0.5} width={width} height={height} style={{ width: '100vw', height: '100vh', justifyContent: 'center' }}>
             <ComposerShader visuals={
                 visuals.map(el => <MainShader code={el.code} uniforms={el.uniforms} />)

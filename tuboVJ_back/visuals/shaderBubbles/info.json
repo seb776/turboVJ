@@ -5,6 +5,14 @@
         {
             "name": "iChannel0",
             "source": "common_assets/greyNoise.png"
+        },
+        {
+            "name": "texBassFactory",
+            "source": "shaderBubbles/BassFactory.png"
+        },
+        {
+            "name": "texZicon",
+            "source": "shaderBubbles/zicon_black_512.png"
         }
     ]
 }

@@ -72,6 +72,7 @@ uniform float mButton7;
 uniform float rButton7;
 #define sat(a) clamp(a, 0., 1.)
 #define FFT(a) 1.
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
 
 void main() {
     vec2 buv = uv;
@@ -103,6 +104,9 @@ void main() {
     col = mix(col, col.zxy, mButton0*mod(time, flicker)/flicker);
     col = mix(col, 1.-col.zxy, rButton0*mod(time, flicker)/flicker);
   col =mix(col, col.xxx, sat(knob7*2.));
+  col.xy *= rot(knob6*6.28); 
+  col.yz *= rot(knob6*6.28);
+  col = abs(col); 
     myOutputColor = vec4(col, 1.);
 }
 `;

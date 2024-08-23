@@ -3,11 +3,14 @@
 // or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 // =========================================================================================================
 
+
 const vec4 hlf = vec4(0.5);
 
 const int marchStp = 64;
 const float maxDst = 150.0;
 const float EPS = 0.000001;
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
 float lengthNY(vec3 v)
 {
   return abs(v.x)+abs(v.y)+abs(v.z);
@@ -90,6 +93,8 @@ vec3 rdr(vec2 uv)
       totDst+= dst;
       p += dir*dst;
   }
+      outCol -= texture(texBassFactory, (uv*.7*vec2(1.+.1*sin(iTime), 1.)-.5)).xyz;
+      outCol += texture(texZicon, uv*4.*rot(iTime*.05)).xyz*.1;
   return outCol;
 }
 
@@ -116,6 +121,8 @@ vec3 rdrVR(vec2 uv, vec3 orig, vec3 vdir)
       totDst+= dst;
       p += dir*dst;
   }
+
+
   return outCol;
 }
 
@@ -150,6 +157,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   uv.x *= ratio;
 
   vec3 outCol = rdrChroma(uv);
+
 
   fragColor = vec4(outCol, 1.0);
 }
