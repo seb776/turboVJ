@@ -7,14 +7,22 @@ export class MySocket {
         this.socket = undefined;
     }
 
-    connect(url: string) {
-        this._callbacks = [];
+    doConnect(url: string) {
         this.socket = new WebSocket(url);
         this.socket.addEventListener("message", (data) => {
             this._callbacks.forEach(cb => {
                 cb(JSON.parse(data.data));
             });
         });
+    }
+
+    connect(url: string) {
+        this.doConnect(url);
+        setInterval(()=>{
+            if (this.socket?.readyState === WebSocket.CLOSED) {
+                this.doConnect(url);
+            }
+        }, 1000);
     }
 
 
