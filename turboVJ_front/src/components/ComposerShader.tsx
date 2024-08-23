@@ -1,6 +1,6 @@
 import { Shaders, Node, GLSL } from "gl-react";
 import { useSocket } from "../contexts/SocketContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SocketPayload } from "../SocketTypes";
 
 export interface KorgNanoKontrol2_VerticalAreaState {
@@ -70,19 +70,40 @@ uniform float fader7;
 uniform float sButton7;
 uniform float mButton7;
 uniform float rButton7;
+#define sat(a) clamp(a, 0., 1.)
+#define FFT(a) 1.
 
 void main() {
+    vec2 buv = uv;
     vec2 cuv = uv-.5;
-    vec4 outFrag = vec4(0,0,0,1);
-    outFrag.xyz += texture(visual0Tex, uv).xyz * fader0;
-    outFrag.xyz += texture(visual1Tex, uv).xyz * fader1;
-    // outFrag.xyz += texture(visual2Tex, uv).xyz * fader2;
-    // outFrag.xyz += texture(visual3Tex, uv).xyz * fader3;
-    // outFrag.xyz += texture(visual4Tex, uv).xyz * fader4;
-    // outFrag.xyz += texture(visual5Tex, uv).xyz * fader5;
-    // outFrag.xyz += texture(visual6Tex, uv).xyz * fader6;
-    // outFrag.xyz += texture(visual7Tex, uv).xyz * fader7;
-    myOutputColor = outFrag;
+    vec3 col = vec3(0,0,0);
+    if (sButton1 > 0.5)
+        buv = abs(buv-.5)+.5;
+    if (mButton1 > 0.5) {
+        float an = atan(cuv.y, cuv.x);
+        buv = vec2(mod(an, 3.14/4.)*.15, length(cuv));
+    }
+    if (rButton1 > 0.5) {
+        float an = atan(cuv.y, cuv.x);
+        buv = vec2(mod(an, 3.14/2.)*.15, length(cuv));
+    }
+    col += texture(visual0Tex, buv).xyz * fader0;
+    col += texture(visual1Tex, buv).xyz * fader1;
+    col += texture(visual2Tex, buv).xyz * fader2;
+    col += texture(visual3Tex, buv).xyz * fader3;
+    col += texture(visual4Tex, buv).xyz * fader4;
+    col += texture(visual5Tex, buv).xyz * fader5;
+    col += texture(visual6Tex, buv).xyz * fader6;
+    col += texture(visual7Tex, buv).xyz * fader7;
+
+    float time = iTime;
+    float flicker = 1./16.;
+    col = mix(col, col+vec3(1.,.2,.5)*(1.-sat(length(cuv)))*2., FFT(0.1)*knob1*mod(time, flicker)/flicker);
+    col = mix(col, col+vec3(1.,.2,.5).zxy*(1.-sat(length(cuv)))*2., sButton0*mod(time, flicker)/flicker);
+    col = mix(col, col.zxy, mButton0*mod(time, flicker)/flicker);
+    col = mix(col, 1.-col.zxy, rButton0*mod(time, flicker)/flicker);
+  col =mix(col, col.xxx, sat(knob7*2.));
+    myOutputColor = vec4(col, 1.);
 }
 `;
 
@@ -93,11 +114,20 @@ interface ComposerShaderProps {
 export default function ComposerShader(props: ComposerShaderProps) {
     const { socket } = useSocket();
     const [ currentMidi, setCurrentMidi ] = useState<KorgNanoKontrol2_State | undefined>();
+    const [time, setTime] = useState<number>(0);
+
+    const refLoop = useRef<number>();
+
+    function handleLoop(curTime: DOMHighResTimeStamp) {
+        setTime(curTime / 1000.0);
+        refLoop.current = requestAnimationFrame(handleLoop);
+    };
 
     useEffect(()=>{
+        handleLoop(0);
         if (socket) {
             socket.onMessage((data) => {
-                console.log("Received korg_nanokontrol2", data.data);
+                // console.log("Received korg_nanokontrol2", data.data);
                 if (data.method === 'korg_nanokontrol2') {
                     setCurrentMidi(data.data);
                 }
@@ -107,7 +137,7 @@ export default function ComposerShader(props: ComposerShaderProps) {
 
     let uniforms = {
         iResolution: [window.innerWidth, window.innerHeight],
-        iTime: 0,
+        iTime: time,
     };
 
     currentMidi?.rightSide.map((verticalArea, index) => {
@@ -127,11 +157,11 @@ export default function ComposerShader(props: ComposerShaderProps) {
         
         return object;
     }).forEach((obj) => {
-        console.log("HERERERE2", obj);
+        // console.log("HERERERE2", obj);
         uniforms = {...uniforms, ...obj};
     });
     
-    console.log("HERERERE", uniforms);
+    // console.log("HERERERE", uniforms);
 
 
     props.visuals.forEach((visual, index) => {

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Shaders, Node, GLSL, Uniform } from "gl-react";
 import { Surface } from "gl-react-dom";
 import { useSocket } from "../contexts/SocketContext";
-import ComposerShader from "./ComposerShader";
+import ComposerShader, { KorgNanoKontrol2_State } from "./ComposerShader";
 
 const shaderTemplate = GLSL`#version 300 es
 
@@ -27,6 +27,8 @@ interface IShaderProps {
     uniforms: UniformDTO[];
 }
 export const MainShader = (props: IShaderProps) => {
+    const refMidi = useRef<KorgNanoKontrol2_State>();
+    const { socket } = useSocket();
     const refNode = useRef<any>();
     const [width, setWidth] = useState<number>(0);
     const [height, setHeight] = useState<number>(0);
@@ -41,11 +43,22 @@ export const MainShader = (props: IShaderProps) => {
     }
 
     function handleLoop(curTime: DOMHighResTimeStamp) {
-        setTime(curTime / 1000.0);
+        let offsetTime = refMidi ? refMidi.current?.rightSide[2].knob : 0;
+        if (refMidi)
+        console.log("OFFSET", refMidi.current?.rightSide[2].knob)
+        setTime(curTime / 1000.0 + (offsetTime-0.5)*10.);
         refLoop.current = requestAnimationFrame(handleLoop);
     };
     useEffect(() => {
         window.addEventListener("resize", handleResize);
+        if (socket) {
+            socket.onMessage((data) => {
+                console.log("Received korg_nanokontrol2", data.data);
+                if (data.method === 'korg_nanokontrol2') {
+                    refMidi.current = data.data;
+                }
+            });
+        }
         handleResize();
         handleLoop(0);
         return () => {

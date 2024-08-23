@@ -1,0 +1,10 @@
+{
+    "type": "shader",
+    "source": "shaderThirtyThousandWaves/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "common_assets/greyNoise.png"
+        }
+    ]
+}

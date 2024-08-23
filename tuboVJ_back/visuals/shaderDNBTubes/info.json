@@ -1,0 +1,6 @@
+{
+    "type": "shader",
+    "source": "shaderDNBTubes/shader.glsl",
+    "uniforms": [
+    ]
+}

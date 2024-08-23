@@ -1,0 +1,14 @@
+{
+    "type": "shader",
+    "source": "shadermackjam_ag/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "common_assets/greyNoise.png"
+        },
+        {
+            "name": "iChannel1",
+            "source": "common_assets/greyNoise.png"
+        }
+    ]
+}

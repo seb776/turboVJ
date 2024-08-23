@@ -1,0 +1,6 @@
+{
+    "type": "shader",
+    "source": "shaderTunnelColorsPsych/shader.glsl",
+    "uniforms": [
+    ]
+}
