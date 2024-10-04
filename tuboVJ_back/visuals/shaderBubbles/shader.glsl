@@ -7,7 +7,7 @@
 const vec4 hlf = vec4(0.5);
 
 const int marchStp = 64;
-const float maxDst = 150.0;
+const float maxDst = 80.0;
 const float EPS = 0.000001;
 #define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
 
@@ -93,7 +93,7 @@ vec3 rdr(vec2 uv)
       totDst+= dst;
       p += dir*dst;
   }
-      outCol -= texture(texBassFactory, (uv*.7*vec2(1.+.1*sin(iTime), 1.)-.5)).xyz;
+      outCol += texture(texZicon, (uv*.7*vec2(1.+.1*sin(iTime), 1.)-.5)).xyz;
       outCol += texture(texZicon, uv*4.*rot(iTime*.05)).xyz*.1;
   return outCol;
 }

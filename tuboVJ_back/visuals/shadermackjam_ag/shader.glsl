@@ -113,7 +113,7 @@ vec3 trace(vec3 ro, vec3 rd, int steps)
 {
   accLight = vec3(0.);
   vec3 p  = ro;
-  for (int i = 0; i < steps; ++i)
+  for (int i = 0; i < steps && distance(p, ro) < 120.; ++i)
   {
     vec2 res = map(p);
     if (res.x < 0.01)

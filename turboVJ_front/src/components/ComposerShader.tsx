@@ -14,11 +14,25 @@ export interface KorgNanoKontrol2_State {
     rightSide: KorgNanoKontrol2_VerticalAreaState[];
 }
 
+function reduceArrayWidth(originalArray: number[], targetWidth: number): number[] {
+    const originalWidth = originalArray.length;
+    const ratio = originalWidth / targetWidth;
+    
+    return Array.from({ length: targetWidth }, (_, i) => {
+      const start = Math.floor(i * ratio);
+      const end = Math.floor((i + 1) * ratio);
+      const segment = originalArray.slice(start, end);
+      
+      return segment.reduce((sum, value) => sum + value, 0) / segment.length;
+    });
+  }
+
 const COMPOSER_SHADER = GLSL`#version 300 es
 
 precision highp float;
 out vec4 myOutputColor;
 in vec2 uv;
+uniform float FFTArray[128];
 uniform vec2 iResolution;
 uniform float iTime;
 uniform sampler2D visual0Tex;
@@ -71,12 +85,13 @@ uniform float sButton7;
 uniform float mButton7;
 uniform float rButton7;
 #define sat(a) clamp(a, 0., 1.)
-#define FFT(a) 1.
+#define FFT(a) (FFTArray[int(mod(floor(a*128.), 128.))] / 255.)
 #define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
 
 void main() {
+
     vec2 buv = uv;
-    vec2 cuv = uv-.5;
+    vec2 cuv = buv-.5;
     vec3 col = vec3(0,0,0);
     if (sButton1 > 0.5)
         buv = abs(buv-.5)+.5;
@@ -88,6 +103,9 @@ void main() {
         float an = atan(cuv.y, cuv.x);
         buv = vec2(mod(an, 3.14/2.)*.15, length(cuv));
     }
+    buv -= (vec2(FFT(0.), FFT(0.1))-.5)*.1*knob0;
+    cuv -= (vec2(FFT(0.), FFT(0.1))-.5)*.1*knob0;
+    
     col += texture(visual0Tex, buv).xyz * fader0;
     col += texture(visual1Tex, buv).xyz * fader1;
     col += texture(visual2Tex, buv).xyz * fader2;
@@ -127,6 +145,14 @@ export default function ComposerShader(props: ComposerShaderProps) {
         refLoop.current = requestAnimationFrame(handleLoop);
     };
 
+    const refFFT = useRef<number[]>(new Array(128));
+
+    let uniforms = {
+        iResolution: [window.innerWidth, window.innerHeight],
+        iTime: time,
+        FFTArray: refFFT.current
+    };
+
     useEffect(()=>{
         handleLoop(0);
         if (socket) {
@@ -137,12 +163,35 @@ export default function ComposerShader(props: ComposerShaderProps) {
                 }
             });
         }
+// Create audio context and analyzer
+const audioContext = new AudioContext();
+const analyser = audioContext.createAnalyser();
+
+// Get microphone input
+navigator.mediaDevices.getUserMedia({audio: true})
+  .then(stream => {
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    
+    // Analyze frequency data
+    function analyze() {
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
+      
+      // Use frequency data here
+      refFFT.current = reduceArrayWidth(Array.from(dataArray), 128);
+    //   console.log(uniforms.FFTArray );
+      
+      requestAnimationFrame(analyze);
+    }
+    
+    analyze();
+  });
+
+
     }, []);
 
-    let uniforms = {
-        iResolution: [window.innerWidth, window.innerHeight],
-        iTime: time,
-    };
+
 
     currentMidi?.rightSide.map((verticalArea, index) => {
         const object :any = {};
@@ -164,6 +213,8 @@ export default function ComposerShader(props: ComposerShaderProps) {
         // console.log("HERERERE2", obj);
         uniforms = {...uniforms, ...obj};
     });
+
+    console.log(refFFT.current );
     
     // console.log("HERERERE", uniforms);
 

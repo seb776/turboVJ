@@ -45,8 +45,8 @@ export const MainShader = (props: IShaderProps) => {
     function handleLoop(curTime: DOMHighResTimeStamp) {
         let offsetTime = refMidi ? refMidi.current?.rightSide[2].knob : 0;
         let timeSpeed = refMidi && refMidi.current ? (refMidi.current.rightSide[3].knob - 0.5)*2 : 1;
-        if (refMidi)
-        console.log("OFFSET", refMidi.current?.rightSide[2].knob)
+        // if (refMidi)
+        // console.log("OFFSET", refMidi.current?.rightSide[2].knob)
         setTime(timeSpeed*curTime / 1000.0 + (offsetTime-0.5)*10.);
         refLoop.current = requestAnimationFrame(handleLoop);
     };
@@ -54,7 +54,7 @@ export const MainShader = (props: IShaderProps) => {
         window.addEventListener("resize", handleResize);
         if (socket) {
             socket.onMessage((data) => {
-                console.log("Received korg_nanokontrol2", data.data);
+                // console.log("Received korg_nanokontrol2", data.data);
                 if (data.method === 'korg_nanokontrol2') {
                     refMidi.current = data.data;
                 }

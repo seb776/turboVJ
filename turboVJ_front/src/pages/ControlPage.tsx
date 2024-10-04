@@ -38,7 +38,7 @@ export default function ControlPage() {
     useEffect(() => {
         if (socket) {
             socket.onMessage((data) => {
-                console.log("Received message control page", data);
+                // console.log("Received message control page", data);
                 if (data.method === 'hardware_stats') {
                     setStats(data.data);
                 }

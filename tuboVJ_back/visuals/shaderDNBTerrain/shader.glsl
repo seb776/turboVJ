@@ -109,7 +109,7 @@ vec4 rdr3D(vec2 uv)
   vec3 dir = normalize(lookat(uv, lookatpos-orig));
   vec3 p = orig + dir;
 
-  for (int i = 0; i <2024;++i)
+  for (int i = 0; i <128;++i)
   {
     float d = map(p);
 
@@ -129,7 +129,7 @@ vec4 rdr3D(vec2 uv)
         */
        //rern vec4(dot(norm,normalize(lPos-p))*vec3(1.),1.);
     }
-    p+= dir*0.1;
+    p+= dir*0.5;
   }
   return vec4(0.);
 }

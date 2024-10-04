@@ -58,7 +58,7 @@ vec3 rdr(vec2 uv)
     vec3 p = ro;
     vec3 acc = vec3(0.);
     float accth = 5.;
-    for (int i = 0; i < 128; ++i)
+    for (int i = 0; i < 128 && distance(p, ro) < 100.; ++i)
     {
         float d = map(p);
         if (d < 0.01)
@@ -86,6 +86,7 @@ _time = iTime;//+texture(iChannel1, fragCoord/8.).x*iTimeDelta*2.;
     
     uv *= r2d(_time*.1);
     vec3 col = rdr(uv);
+    if (false)
     { // Not so cheap antialiasing SSAA x4
 
         vec2 off = vec2(1., -1.)/(iResolution.x*2.);

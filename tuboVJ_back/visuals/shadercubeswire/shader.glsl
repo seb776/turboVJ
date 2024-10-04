@@ -71,7 +71,7 @@ vec3 trace(vec3 ro, vec3 rd, int steps)
 {
     accCol = vec3(0.);
     vec3 p = ro;
-    for (int i = 0; i < steps; ++i)
+    for (int i = 0; i < steps && distance(ro, p) < 30.; ++i)
     {
         vec2 res = map(p);
         if (res.x < 0.01)
@@ -138,7 +138,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     _time = iTime;//+texture(iChannel2, fragCoord/8.).x*iTimeDelta;
     uv *= 1.-length(uv*sin(_time));
     vec3 col = rdr(uv);
-    //if(false)
+    if(false)
     { // Not so cheap antialiasing SSAA x4
         vec2 off = vec2(1., -1.)/(iResolution.x*1.75);
         col += rdr(uv-off.xx);

@@ -159,6 +159,7 @@ vec2 ouv = (fragCoord.xy/iResolution.xy);
   _seed = uv.x+length(uv)+iTime;//texture(iChannel0,uv).x+iTime;
 
   vec3 col = rdr(uv,ouv);
+  if (false)
     { // Not so cheap antialiasing SSAA x4
 
         vec2 off = vec2(1., -1.)/(iResolution.x*2.);

@@ -123,7 +123,7 @@ vec3 rdr3D(vec2 uv)
     vec3 dir = lookAt(lookAtPos - orig, uv); 
     vec3 p = orig + dir;
     float dist = 0.;
-    for (int i = 0; i < 256; ++i)
+    for (int i = 0; i < 256 && distance(orig, p) < 10.; ++i)
     {
         float d = map(p);
         if (d < 0.001)
