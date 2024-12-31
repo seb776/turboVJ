@@ -52,5 +52,10 @@ export function ResetMidi(midiState: KorgNanoKontrol2_State, onMidiMessage: (sta
         onMidiMessage(midiState);
         // console.log(`m: ${message} d: ${deltaTime}`);
     });
-    midiInput.openPort(0);
+    try {
+        midiInput.openPort(0);
+    }
+    catch (_) {
+
+    }
 }
