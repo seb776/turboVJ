@@ -95,6 +95,8 @@ vec3 rdr(vec2 uv)
   }
       outCol += texture(texZicon, (uv*.7*vec2(1.+.1*sin(iTime), 1.)-.5)).xyz;
       outCol += texture(texZicon, uv*4.*rot(iTime*.05)).xyz*.1;
+      outCol = mix(outCol.yzx, outCol.zxy, sin(length(uv)*5.-iTime));
+
   return outCol;
 }
 
@@ -121,7 +123,6 @@ vec3 rdrVR(vec2 uv, vec3 orig, vec3 vdir)
       totDst+= dst;
       p += dir*dst;
   }
-
 
   return outCol;
 }

@@ -136,6 +136,25 @@ vec3 rdr3D(vec2 uv)
     return vec3(0.);
 }
 
+vec3 grad(float f)
+{
+    float stp = 0.01;
+    f = sat(f);
+    f = floor(f/stp)*stp;
+    vec3 cols[5];
+    
+    cols[0] = vec3(1.000,0.733,0.000);
+    cols[1] = vec3(1.000,0.000,0.067);
+    cols[2] = vec3(1.000,0.000,0.969);
+    cols[3] = vec3(0.000,0.067,1.000);
+    cols[4] = vec3(0.000,0.851,1.000);
+
+    float cur = f*4.0;
+    int icur = int(floor(cur));
+    int next = min(icur+1, 4);
+    return mix(cols[icur], cols[next], fract(cur)); 
+}
+
 vec3 rdrScn(vec2 uv)
 {
   vec3 land;
@@ -158,7 +177,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 uv*= 3.2+smoothstep(0., .439, mod(time,.4389))*.1; //vertical
     uv *= r2d(PI/12.);
   vec3 col = rdrScn(uv);
-
+  col = grad(sin(length(col)));
 
   fragColor = vec4(col, 1.0);
 }

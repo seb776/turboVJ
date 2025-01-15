@@ -1,3 +1,4 @@
+#define sat(a) clamp(a, 0., 1.)
 float _seed;
 float hash11(float seed)
 {
@@ -7,6 +8,51 @@ float rand()
 {
   return hash11(_seed++);
 }
+float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+
+float noise(vec3 p){
+    vec3 a = floor(p);
+    vec3 d = p - a;
+    d = d * d * (3.0 - 2.0 * d);
+
+    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
+    vec4 k1 = perm(b.xyxy);
+    vec4 k2 = perm(k1.xyxy + b.zzww);
+
+    vec4 c = k2 + a.zzzz;
+    vec4 k3 = perm(c);
+    vec4 k4 = perm(c + 1.0);
+
+    vec4 o1 = fract(k3 * (1.0 / 41.0));
+    vec4 o2 = fract(k4 * (1.0 / 41.0));
+
+    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
+    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
+
+    return o4.y * d.y + o4.x * (1.0 - d.y);
+}
+
+vec3 grad(float f)
+{
+    float stp = 0.01;
+    f = sat(f);
+    f = floor(f/stp)*stp;
+    vec3 cols[5];
+    
+    cols[0] = vec3(0.58f, 1.f, 0.2f);
+    cols[1] = vec3(1.f, 0.f, 0.56f);
+    cols[2] = vec3(0.07f, 0.18f, 0.38f);
+    cols[3] = vec3(0.0);
+    cols[4] = vec3(0.0);
+
+    float cur = f*4.0;
+    int icur = int(floor(cur));
+    int next = min(icur+1, 4);
+    return mix(cols[icur], cols[next], fract(cur)); 
+}
+
 float _cube(vec3 p, vec3 s)
 {
   vec3 l = abs(p)-s;
@@ -29,7 +75,6 @@ mat2 r2d(float a)
   float s = sin(a);
   return mat2(c,-s,s,c);
 }
-#define sat(a) clamp(a,0.1,1.)
 
 vec3 getCam(vec3 rd, vec2 uv)
 {
@@ -47,6 +92,7 @@ vec2 _min(vec2 a, vec2 b)
 
 vec2 map(vec3 p)
 {
+  vec3 op = p;
   vec2 acc = vec2(10000.,-1.);
 
 //acc = _min(acc, vec2(length(p)-1.,0.));
@@ -65,6 +111,7 @@ p2.yz*=r2d(-t);
 float cube = _cube(p2,vec3(.2));
 acc = _min(acc,vec2(cube,ida));
 float cubew = _cucube(p2,vec3(.21),vec3(.1));
+cubew -= noise(op*20.)*.05;
 acc = _min(acc,vec2(cubew,-ida));
   return acc;
 }
@@ -85,7 +132,7 @@ vec3 trace(vec3 ro, vec3 rd, int steps)
     if (res.x<0.01)
       return vec3(res.x,distance(p,ro),res.y);
     p+=rd*res.x*.35;
-
+      accCol += vec3(1.)*(1.-sat(res.x/.5))*.05;
   }
   return vec3(-1.);
 }
@@ -126,6 +173,7 @@ vec3 rdr(vec2 uv,vec2 ouv)
   rd = getCam(rd,uv);
 
   vec3 res = trace(ro,rd, 128);
+  vec3 acc = accCol;
   float y =-1.;
   if (res.y >0.)
   {
@@ -146,8 +194,9 @@ vec3 rdr(vec2 uv,vec2 ouv)
       }
     }
   }
-col+=accCol;
+col+=acc;
 //col = mix(col, texture(iChannel1,ouv).xyz,.6);
+col = grad(1.-col.x);
   return col;
 }
 

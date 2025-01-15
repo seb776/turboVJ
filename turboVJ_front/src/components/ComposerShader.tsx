@@ -27,7 +27,7 @@ function reduceArrayWidth(originalArray: number[], targetWidth: number): number[
     });
   }
 
-const COMPOSER_SHADER = GLSL`#version 300 es
+const COMPOSER_SHADER = /*glsl*/`#version 300 es
 
 precision highp float;
 out vec4 myOutputColor;
@@ -214,7 +214,7 @@ navigator.mediaDevices.getUserMedia({audio: true})
         uniforms = {...uniforms, ...obj};
     });
 
-    console.log(refFFT.current );
+    // console.log(refFFT.current );
     
     // console.log("HERERERE", uniforms);
 

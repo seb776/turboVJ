@@ -14,6 +14,7 @@ vec2 _min(vec2 a, vec2 b)
     return b;
 }
 
+
 float _cube(vec3 p, vec3 s)
 {
     vec3 l = abs(p)-s;
@@ -52,7 +53,9 @@ vec2 map(vec3 p)
     {
     
         acc = _min(acc, vec2(_cube(p, sz*.97*(sin(_time)*.2+.5)), 0.));
-        acc = _min(acc, vec2(_cubeWire(p, sz, vec3(0.02)), 1.));
+
+        float cubewire = _cubeWire(p, sz, vec3(0.02));
+        acc = _min(acc, vec2(cubewire, 1.));
     }
     return acc;
 }
