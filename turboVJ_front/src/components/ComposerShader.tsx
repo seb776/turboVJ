@@ -214,7 +214,7 @@ navigator.mediaDevices.getUserMedia({audio: true})
         uniforms = {...uniforms, ...obj};
     });
 
-    console.log(refFFT.current );
+    // console.log(refFFT.current );
     
     // console.log("HERERERE", uniforms);
 
@@ -222,8 +222,6 @@ navigator.mediaDevices.getUserMedia({audio: true})
     props.visuals.forEach((visual, index) => {
         (uniforms as any)["visual" + index + "Tex"] = visual;
     });
-
-    
 
     return <>
         <Node ignoreUnusedUniforms shader={{ frag: COMPOSER_SHADER }} uniforms={uniforms}

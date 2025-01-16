@@ -27,19 +27,21 @@ for (let i = 0 ; i < 8; ++i) {
 
 const connectedSockets: WebSocket.WebSocket[] = [];
 
+function broadcastMidiState(state: KorgNanoKontrol2_State) {
+    // console.log("MIDI STATE " + JSON.stringify(state));
+    connectedSockets.forEach(sock=>{
+        if (sock) {
+            const socketPayload : SocketPayload = {
+                method: 'korg_nanokontrol2',
+                data: state
+            };
+            sock.send(JSON.stringify(socketPayload));
+        }
+    })
+}
+
 setInterval(()=>{
-    ResetMidi(midiState, (state: KorgNanoKontrol2_State) => {
-        // console.log("MIDI STATE " + JSON.stringify(state));
-        connectedSockets.forEach(sock=>{
-            if (sock) {
-                const socketPayload : SocketPayload = {
-                    method: 'korg_nanokontrol2',
-                    data: state
-                };
-                sock.send(JSON.stringify(socketPayload));
-            }
-        })
-    });
+    ResetMidi(midiState, broadcastMidiState);
 }, 1000)
 
 SetupHardwareMonitoring((stats: HardwareStats) =>{
@@ -76,9 +78,9 @@ server.register(async function (fastify) {
     server.get('/websocket', { websocket: true }, (connection /* SocketStream */, req /* FastifyRequest */) => {
         console.log('websocket connected');
         connectedSockets.push(connection);
+        broadcastMidiState(midiState);
         connection.on('open', () => {
             console.log('websocket opened');
-    
         })
         connection.on('message', message => {
           // message.toString() === 'hi from client'
@@ -125,8 +127,11 @@ interface VisualsDTO {
     visuals: VisualDTO[];
 }
 
+const ROOT_DIRRECTORY = "./src/";
+
 server.get('/visuals', async (request, reply) => {
-    let folderContent = fs.readdirSync("./visuals/");
+    const visualsDirectory = path.join(ROOT_DIRRECTORY, "visuals/");
+    let folderContent = fs.readdirSync(visualsDirectory);
 
     let visualsDTO: VisualsDTO = {
         visuals: []
@@ -134,7 +139,7 @@ server.get('/visuals', async (request, reply) => {
     folderContent.forEach(file => {
         if (file !== "common_assets") {
             try {
-                const jsonPath = path.join("visuals", file, "info.json");
+                const jsonPath = path.join(visualsDirectory, file, "info.json");
                 const jsonContent = fs.readFileSync(jsonPath).toString();
                 const visualDTO = JSON.parse(jsonContent) as VisualDTO;
                 visualsDTO.visuals.push(visualDTO);

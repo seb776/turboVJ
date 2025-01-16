@@ -158,6 +158,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
   vec3 outCol = rdrChroma(uv);
 
-
+  outCol = outCol.xxx;
   fragColor = vec4(outCol, 1.0);
 }
