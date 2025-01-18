@@ -1,0 +1,14 @@
+{
+    "type": "shader",
+    "source": "sauvage7_claws/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "sauvage7_claws/Claws1.png"
+        },
+        {
+            "name": "iChannel1",
+            "source": "common_assets/greyNoise.png"
+        }
+    ]
+}

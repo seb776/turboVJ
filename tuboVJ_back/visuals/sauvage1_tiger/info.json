@@ -1,0 +1,18 @@
+{
+    "type": "shader",
+    "source": "sauvage1_tiger/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "sauvage1_tiger/Liane1.png"
+        },
+        {
+            "name": "iChannel1",
+            "source": "sauvage1_tiger/Face2.png"
+        },
+        {
+            "name": "iChannel2",
+            "source": "sauvage1_tiger/FaceLight.png"
+        }
+    ]
+}

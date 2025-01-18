@@ -1,0 +1,10 @@
+{
+    "type": "shader",
+    "source": "sauvage3_plantsZ/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "sauvage3_plantsZ/Plant.png"
+        }
+    ]
+}

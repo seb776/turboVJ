@@ -1,0 +1,6 @@
+{
+    "type": "shader",
+    "source": "sauvage4_tunnelTargets/shader.glsl",
+    "uniforms": [
+    ]
+}

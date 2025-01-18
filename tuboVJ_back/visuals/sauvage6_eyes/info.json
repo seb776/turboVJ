@@ -1,0 +1,10 @@
+{
+    "type": "shader",
+    "source": "sauvage6_eyes/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "common_assets/greyNoise.png"
+        }
+    ]
+}

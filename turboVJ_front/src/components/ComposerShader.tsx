@@ -112,7 +112,7 @@ void main() {
     col += texture(visual3Tex, buv).xyz * fader3;
     col += texture(visual4Tex, buv).xyz * fader4;
     col += texture(visual5Tex, buv).xyz * fader5;
-    col += texture(visual6Tex, buv).xyz * fader6;
+    col += texture(visual6Tex, (buv-.5)*knob5+.5).xyz * fader6;
     col += texture(visual7Tex, buv).xyz * fader7;
 
     float time = iTime;

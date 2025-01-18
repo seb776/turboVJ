@@ -116,6 +116,7 @@ interface UniformDTO {
 }
 
 interface VisualDTO {
+    name: string;
     type: string;
     source: string;
     uniforms: UniformDTO[];
@@ -137,6 +138,7 @@ server.get('/visuals', async (request, reply) => {
                 const jsonPath = path.join("visuals", file, "info.json");
                 const jsonContent = fs.readFileSync(jsonPath).toString();
                 const visualDTO = JSON.parse(jsonContent) as VisualDTO;
+                visualDTO.name = file;
                 visualsDTO.visuals.push(visualDTO);
             }
             catch (err) {

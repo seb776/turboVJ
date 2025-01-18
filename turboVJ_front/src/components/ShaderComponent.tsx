@@ -96,6 +96,7 @@ interface UniformDTO {
 }
 
 interface VisualDTO {
+    name: string;
     type: string;
     source: string;
     uniforms: UniformDTO[];
@@ -122,7 +123,21 @@ export const ShaderSurface = (props: ShaderProps) => {
         fetch(`${API_ROOT}/visuals`).then(b => b.text()).then(text => {
             const visualsJsonObj = JSON.parse(text) as VisualsDTO;
             const visualsDTO = visualsJsonObj.visuals;
-            Promise.all(visualsDTO.map(el => handleClick(el))).then((visuals) => {
+            const selectedVisuals = [
+                "sauvage1_tiger",
+                "sauvage2_blobs",
+                "sauvage3_plantsZ",
+                "sauvage4_tunnelTargets",
+                "sauvage5_dunnos",
+                "sauvage6_eyes",
+                "sauvage7_claws",
+                "sauvage8_teststrates"
+            ];
+            Promise.all(visualsDTO.filter((el)=>{
+                console.log(el.name)
+                return selectedVisuals.includes(el.name)
+            }).map(el => handleClick(el)))
+            .then((visuals) => {
                 setVisuals(visuals);
             })
         })

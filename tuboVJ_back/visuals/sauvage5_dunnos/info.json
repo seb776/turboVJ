@@ -1,0 +1,10 @@
+{
+    "type": "shader",
+    "source": "sauvage5_dunnos/shader.glsl",
+    "uniforms": [
+        {
+            "name": "iChannel0",
+            "source": "common_assets/greyNoise.png"
+        }
+    ]
+}
